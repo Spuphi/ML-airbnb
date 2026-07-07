@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import numpy as np
+import matplotlib.pyplot as plt
 
 # 1. Daten laden und vorbereiten
 df = pd.read_csv("data/listings_clean.csv")
@@ -40,4 +41,30 @@ rmse = np.sqrt(mean_squared_error(y_test, y_pred)) # Root mean squared Error
 print(f"MAE:  {mae:.2f}€")
 print(f"RMSE: {rmse:.2f}€")
 
-print(df["price"].describe())
+print(df["price"].describe()) # Verteilung anschauen
+
+# Feature Importance
+feature_importance = pd.Series(
+    model.feature_importances_,
+    index=X.columns
+).sort_values(ascending=False)
+
+print(feature_importance.head(10))
+print(df["bathrooms"].describe())
+print(df["bathrooms"].value_counts().head(10))
+print(feature_importance.tail(10))
+
+# Feature Importance Plot
+feature_importance = pd.Series(
+    model.feature_importances_,
+    index=X.columns
+).sort_values(ascending=False)
+
+plt.figure(figsize=(10, 8))
+feature_importance.plot(kind="barh")
+plt.title("Feature Importance - Random Forest")
+plt.xlabel("Wichtigkeit")
+plt.tight_layout()
+plt.savefig("feature_importance.png")
+print("✅ Gespeichert als feature_importance.png")
+
