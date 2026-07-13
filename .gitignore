@@ -1,0 +1,4 @@
+# ganze Ordner ignorieren
+data/
+
+# einzelne Dateien ignorieren

@@ -16,8 +16,10 @@ print(listing_data["price"].head(10)) # wie sieht der Preis aus?
 listing_data["price"] = listing_data["price"].astype(str).str.replace(r"[$,]", "", regex=True)
 listing_data["price"] = pd.to_numeric(listing_data["price"], errors="coerce")
 
-# Ausreißer Zeile entfernen
-listing_data = listing_data[(listing_data["price"] > 0) & (listing_data["price"] <= 2000)]
+# Ausreißer entfernen, oberes und unteres 1%
+lower = listing_data["price"].quantile(0.01)
+upper = listing_data["price"].quantile(0.99)
+listing_data = listing_data[(listing_data["price"] >= lower) & (listing_data["price"] <= upper)]
 
 # Zeilen ohne Preis löschen
 listing_data = listing_data.dropna(subset=["price"])
@@ -25,7 +27,7 @@ listing_data = listing_data.dropna(subset=["price"])
 print(listing_data["price"].head(10))
 #-----------------------------------------------------------------
 # 2. Relevante Spalten auswählen
-keep_columns = ["price",
+keep_columns = ["id", "price",
     "room_type", "property_type", "accommodates", "bathrooms", "bedrooms", "beds",
     "neighbourhood_cleansed", "latitude", "longitude",
     "minimum_nights", "maximum_nights", "instant_bookable",
