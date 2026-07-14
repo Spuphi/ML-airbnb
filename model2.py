@@ -4,9 +4,16 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder
 
 # 1. Daten laden und vorbereiten
 df = pd.read_csv("data/combined_data.csv")
+
+# Numerical Data
+for col in ["sentiment_label", "district_group", "district"]:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col].astype(str))
+
 
 # Freitext-Spalten rauswerfen (kann Modell noch nicht verarbeiten)
 df = df.drop(["id", "name", "description", "amenities"], axis=1)
@@ -27,6 +34,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 print(f"Training:  {X_train.shape}")
 print(f"Test:      {X_test.shape}")
+
+print(X_train.select_dtypes(include=['object']).head())
 
 # 3. Random Forest trainieren
 model = RandomForestRegressor(n_estimators=100, random_state=42)
@@ -66,5 +75,17 @@ plt.title("Feature Importance - Random Forest")
 plt.xlabel("Wichtigkeit")
 plt.tight_layout()
 plt.savefig("feature_importance2.png")
-print("✅ Gespeichert als feature_importance2.png")
+print("Gespeichert als feature_importance2.png")
 
+# Preisbereich
+print("\nPreisbereich:")
+print(df["price"].describe())
+
+# Top-3 Features
+feature_importance = pd.Series(
+    model.feature_importances_,
+    index=X.columns
+).sort_values(ascending=False)
+
+print("\nTop-3 Features:")
+print(feature_importance.head(3))

@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 df = pd.read_csv("data/listings_clean.csv")
 
 # Freitext-Spalten rauswerfen (kann Modell noch nicht verarbeiten)
-df = df.drop(["id","name", "description", "amenities"], axis=1)
+df = df.drop(columns=[col for col in ["id", "name", "description", "amenities"] if col in df.columns])
 
 # X (Features) und y (Zielvariable) trennen
 X = df.drop("price", axis=1)
@@ -66,5 +66,5 @@ plt.title("Feature Importance - Random Forest")
 plt.xlabel("Wichtigkeit")
 plt.tight_layout()
 plt.savefig("feature_importance.png")
-print("✅ Gespeichert als feature_importance.png")
+print("Gespeichert als feature_importance.png")
 
