@@ -66,5 +66,5 @@ plt.title("Feature Importance - Random Forest")
 plt.xlabel("Wichtigkeit")
 plt.tight_layout()
 plt.savefig("feature_importance2.png")
-print("✅ Gespeichert als feature_importance2.png")
+print("Gespeichert als feature_importance2.png")
 
