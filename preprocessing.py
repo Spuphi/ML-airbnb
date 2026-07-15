@@ -4,15 +4,15 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
 
 listing_file_path = "data/listings.csv"
-listing_data = pd.read_csv("data/listings.csv", low_memory=False) # low_memory liest große Dateien sauberer
+listing_data = pd.read_csv("data/listings.csv", low_memory=False)
 print(listing_data.head())
 
-print(listing_data.shape)           # wie viele Zeilen/Spalten?
-print(listing_data.columns.tolist()) # welche Spalten gibt es?
-print(listing_data["price"].head(10)) # wie sieht der Preis aus?
+# Daten Überblick
+print(listing_data.shape)           
+print(listing_data.columns.tolist()) 
+print(listing_data["price"].head(10))
 
-#-----------------------------------------------------------------
-# 1. Preis bereinigen
+# Preis bereinigen
 listing_data["price"] = listing_data["price"].astype(str).str.replace(r"[$,]", "", regex=True)
 listing_data["price"] = pd.to_numeric(listing_data["price"], errors="coerce")
 
@@ -25,8 +25,9 @@ listing_data = listing_data[(listing_data["price"] >= lower) & (listing_data["pr
 listing_data = listing_data.dropna(subset=["price"])
 
 print(listing_data["price"].head(10))
-#-----------------------------------------------------------------
-# 2. Relevante Spalten auswählen
+
+
+# Relevante Spalten auswählen
 keep_columns = ["id", "price",
     "room_type", "property_type", "accommodates", "bathrooms", "bedrooms", "beds",
     "neighbourhood_cleansed", "latitude", "longitude",
@@ -40,15 +41,13 @@ keep_columns = ["id", "price",
 listing_data = listing_data[keep_columns]
 print(listing_data.columns.tolist)
 
-#-----------------------------------------------------------------
-#3. Kategorische Spalten finden
+# Kategorische Spalten finden
 s = listing_data.dtypes.astype(str).isin(["object", "str", "string"])
 object_cols = list(s[s].index)
 print(object_cols)
 
-# Welche davon sind wirklich Kategorisch?
-for col in object_cols: # gehe jede Spalte durch, col ist aktueller spaltenname
-    n_unique = listing_data[col].nunique() # listing_data[col] greift auf spalte zu und zählt wie viele unterschiedliche werte
+for col in object_cols:
+    n_unique = listing_data[col].nunique() 
     print(f"{col}: {n_unique} eindeutige Werte")
 
 # host_response_rate ist unklar -> anschauen
@@ -70,8 +69,7 @@ listing_data["host_response_rate"] = listing_data["host_response_rate"].fillna(
 
 print(listing_data["host_response_rate"].head(10))
 
-#-----------------------------------------------------------------
-# 4. NaN bei kategorischen Spalten behandeln
+# NaN bei kategorischen Spalten behandeln
 # Welche Spalten haben NaN
 for col in ["room_type", "property_type", "neighbourhood_cleansed", "instant_bookable", "host_is_superhost"]:
     print(f"{col}: {listing_data[col].isna().sum()} fehlende Werte")  # -> host_is_superhost hat fehlende Werte
@@ -89,8 +87,7 @@ listing_data["host_is_superhost"] = imputer.transform(listing_data[["host_is_sup
 for col in ["room_type", "property_type", "neighbourhood_cleansed", "instant_bookable", "host_is_superhost"]:
     print(f"{col}: {listing_data[col].isna().sum()} fehlende Werte")
 
-#-----------------------------------------------------------------
-# 5. Kategorische Spalten encoden
+# Kategorische Spalten encoden
 # Binäre Spalten (instant_bookable, host_is_superhost)
 # instant_bookable
 print(listing_data["instant_bookable"].head(10)) # werte werden mit t und f gekennzeichnet
@@ -133,8 +130,7 @@ print(clean_data.shape)
 # (alte Spalten - 1 [room_type weg]) + 4 [neue One-Hot-Spalten] -> also 3 mehr -> passt
 
 
-# ----------------------------------------------------------------
-# Label encoding - ersetzt einfach text durch zahl
+# Label encoding: ersetzt text durch zahl
 le = LabelEncoder()
 # property_type
 print(clean_data["property_type"].head(10))
@@ -151,8 +147,7 @@ print(clean_data["neighbourhood_cleansed"].head(10))
 print(clean_data.isna().sum().sum())
 # Sollte 0 sein! Falls hier eine große Zahl auftaucht, war der Index-Fix nicht korrekt
 
-#-------------------------------------------------------------------------------------
-# 5. Restliche numerische Spalten auf NaN prüfen
+# Restliche numerische Spalten auf NaN prüfen
 num_cols = ["bathrooms", "bedrooms", "beds", "review_scores_rating",
             "review_scores_cleanliness", "review_scores_location",
             "review_scores_value", "reviews_per_month", "host_total_listings_count"]
@@ -176,8 +171,7 @@ for col in num_cols:
     median_val = clean_data[col].median()
     clean_data[col] = clean_data[col].fillna(median_val)
 
-#------------------------------------------------------------------------
-# 6. Freitext spalten NaN auffüllen
+# Freitext spalten NaN auffüllen
 for col in ["name", "description", "amenities"]:
     clean_data[col] = clean_data[col].fillna("")
 
